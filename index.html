@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090a0f">
+<title>TAMA V0.7 — Online Duel</title>
+<style>
+:root{--bg:#08090e;--panel:#11131c;--gold:#d8b574;--gold2:#f2d9a4;--text:#f7f4ed;--muted:#9295a4;--line:#ffffff17;--red:#ff737d;--blue:#82aaff;--green:#77e0ad}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#292037 0,transparent 45%),radial-gradient(ellipse at 100% 100%,#10202a 0,transparent 35%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;display:flex;align-items:center;justify-content:center;padding:18px;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit}button{cursor:pointer}.app{width:min(100%,460px)}.topline,.footer{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--muted);font-size:9px;letter-spacing:1.5px;margin:0 3px 14px}.pill{border:1px solid var(--line);border-radius:999px;padding:7px 10px;display:flex;align-items:center;gap:7px}.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 12px #77e0ad}
+.card{border:1px solid var(--line);background:linear-gradient(145deg,#151721ef,#0e1018f7);border-radius:29px;padding:clamp(19px,5vw,28px);box-shadow:0 25px 90px #0008;backdrop-filter:blur(20px)}
+.brand{text-align:center;margin:3px 0 22px}.brand h1{font-family:Georgia,serif;font-size:clamp(32px,9vw,42px);letter-spacing:5px;margin:0}.brand h1 span{color:var(--gold)}.brand p{font-size:9px;letter-spacing:3px;color:var(--muted);margin:9px 0 0}
+.screen{display:none}.screen.active{display:block;animation:rise .2s ease-out}@keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.hero{border:1px solid #d8b57430;border-radius:19px;padding:17px;background:linear-gradient(130deg,#d8b57412,#ffffff03);margin-bottom:14px}.hero strong{display:block;font:700 19px Georgia,serif;margin-bottom:5px}.hero p{color:var(--muted);font-size:12px;line-height:1.6;margin:0}
+.label{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin:16px 0 9px}.field{width:100%;padding:15px;border:1px solid var(--line);border-radius:15px;background:#ffffff07;color:var(--text);outline:none;text-align:center;font-size:15px;margin-bottom:11px}.field:focus{border-color:#d8b57499}
+.btn{width:100%;border:1px solid transparent;border-radius:15px;padding:15px 12px;font-size:11px;letter-spacing:1.5px;font-weight:800}.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#16120a}.ghost{background:#ffffff08;color:var(--text);border-color:var(--line);margin-top:10px}.quiet{background:transparent;color:var(--muted);margin-top:6px}.notice{font-size:11px;line-height:1.6;color:var(--muted);text-align:center;margin:13px 3px 0}
+.status{border:1px solid var(--line);background:#ffffff06;border-radius:14px;padding:12px;text-align:center;font-size:12px;color:#c9cad4;margin:12px 0}.roomcode{font:900 36px Georgia,serif;letter-spacing:8px;text-align:center;color:var(--gold2);padding:19px 8px;border:1px dashed #d8b57480;border-radius:20px;margin:14px 0 12px;user-select:all}.twobtn{display:grid;grid-template-columns:1fr 1fr;gap:9px}.twobtn .btn{margin:0;padding:13px 7px;letter-spacing:1px}
+.gamehead{display:flex;justify-content:space-between;align-items:center;gap:8px}.gamehead .brand{text-align:left;margin:0}.gamehead .brand h1{font-size:20px;letter-spacing:3px}.smallbtn{background:#ffffff08;border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:9px 11px;font-size:10px;letter-spacing:1px;font-weight:800}
+.players{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.player{border:1px solid var(--line);border-radius:16px;padding:12px;background:#ffffff04;min-width:0}.player.active{border-color:#d8b57499;background:#d8b57412}.playerhead{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;min-width:0}.symbol{display:grid;place-items:center;width:29px;height:29px;border-radius:10px;background:#ffffff0a;font:900 19px Georgia,serif}.player.x .symbol{color:var(--red)}.player.o .symbol{color:var(--blue)}.playername{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.score{font-size:10px;color:var(--muted);margin:7px 0 0 37px}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:14px 0}.cell{aspect-ratio:1;min-width:0;border-radius:18px;border:1px solid #ffffff12;background:linear-gradient(145deg,#ffffff0b,#ffffff03);display:grid;place-items:center;font:900 clamp(42px,13vw,58px) Georgia,serif;color:var(--text);transition:background .15s,border-color .15s}.cell:disabled{cursor:default}.cell.x{color:var(--red);text-shadow:0 0 24px #ff737d35}.cell.o{color:var(--blue);text-shadow:0 0 24px #82aaff35}.cell.win{border-color:var(--gold);background:#d8b57420}.hidden{display:none!important}.footer{margin-top:14px;margin-bottom:0}
+@media(min-width:520px){body{padding:28px}.card{padding:28px}}
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="topline"><span>✦ TAMA STUDIO</span><span class="pill"><i class="dot"></i> SERVER ONLINE</span></div>
+  <section class="card">
+    <div class="brand"><h1>TAMA <span>V0.7</span></h1><p>THINK SMART · PLAY ANYWHERE</p></div>
+    <section id="user" class="screen active">
+      <div class="hero"><strong>Duel dari mana saja.</strong><p>Buat room pribadi, bagikan kode ke teman, lalu bermain realtime lewat server multiplayer.</p></div>
+      <div class="label">Nama pemain</div><input id="username" class="field" maxlength="16" placeholder="Masukkan nama kamu" autocomplete="nickname">
+      <button id="enter" class="btn gold">MASUK KE GAME →</button>
+      <p class="notice">Multiplayer memerlukan server TAMA V0.7 yang sudah di-deploy.</p>
+    </section>
+    <section id="menu" class="screen">
+      <div class="hero"><strong id="welcome">Halo!</strong><p>Pilih mode permainan yang kamu mau.</p></div>
+      <button id="online" class="btn gold">🌐 MULTIPLAYER ONLINE</button><button id="botmode" class="btn ghost">🤖 MAIN LAWAN BOT</button><button id="rename" class="btn quiet">GANTI NAMA</button>
+    </section>
+    <section id="lobby" class="screen">
+      <div class="hero"><strong>Multiplayer online</strong><p>Host membuat room dan membagikan kode. Teman dapat bergabung dari jaringan internet yang berbeda.</p></div>
+      <button id="create" class="btn gold">＋ BUAT ROOM BARU</button>
+      <div class="label">Gabung room teman</div><input id="roomInput" class="field" maxlength="6" placeholder="KODE ROOM" autocomplete="off" autocapitalize="characters">
+      <button id="join" class="btn ghost">GABUNG ROOM →</button><button id="lobbyBack" class="btn quiet">← KEMBALI</button>
+      <p class="notice">Server memvalidasi giliran dan langkah. Jangan bagikan kode room ke orang yang tidak kamu inginkan.</p>
+    </section>
+    <section id="wait" class="screen">
+      <div class="label" style="text-align:center">Bagikan kode room ini</div><div id="roomCode" class="roomcode">------</div>
+      <div class="twobtn"><button id="copy" class="btn ghost">▣ SALIN KODE</button><button id="cancel" class="btn ghost">BATAL</button></div>
+      <div id="waitStatus" class="status">Membuat room…</div><p class="notice">Jangan tutup halaman ini saat menunggu teman.</p>
+    </section>
+    <section id="game" class="screen">
+      <div class="gamehead"><div class="brand"><h1>TAMA <span>V0.7</span></h1><p id="modeLabel">ONLINE DUEL</p></div><button id="leave" class="smallbtn">KELUAR ↗</button></div>
+      <div class="players"><div id="px" class="player x"><div class="playerhead"><span class="symbol">×</span><span id="nx" class="playername">Pemain X</span></div><div id="sx" class="score">MENANG 0</div></div><div id="po" class="player o"><div class="playerhead"><span class="symbol">○</span><span id="no" class="playername">Pemain O</span></div><div id="so" class="score">MENANG 0</div></div></div>
+      <div id="gameStatus" class="status">Menyiapkan game…</div><div id="board" class="board"></div><button id="rematch" class="btn gold hidden">↻ MAIN LAGI</button><button id="gameBack" class="btn ghost">KEMBALI KE MENU</button><p id="connection" class="notice">Koneksi realtime via server TAMA.</p>
+    </section>
+  </section>
+  <div class="footer"><span>© TAMA · V0.7</span><span>REALTIME MULTIPLAYER</span></div>
+</main>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const screens=['user','menu','lobby','wait','game'];
+let username='',socket=null,roomCode='',mark='X',mode='online',gameState=null,botState=null,botTimer=null;
+function show(s){screens.forEach(x=>$(x).classList.toggle('active',x===s))}
+function status(msg){$('gameStatus').textContent=msg}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function ensureSocket(){
+ if(socket&&socket.connected)return socket;
+ if(!socket){socket=io({transports:['websocket','polling']});
+  socket.on('connect',()=>{$('connection').textContent='Terhubung ke server realtime.'});
+  socket.on('disconnect',()=>{$('connection').textContent='Koneksi terputus. Mencoba menyambung kembali…';});
+  socket.on('connect_error',()=>{$('connection').textContent='Tidak bisa terhubung ke server. Pastikan server sudah aktif.';});
+  socket.on('room-created',d=>{roomCode=d.code;$('roomCode').textContent=roomCode;$('waitStatus').textContent='Room aktif. Bagikan kode ke teman.';show('wait')});
+  socket.on('room-joined',d=>{roomCode=d.code;mark=d.mark;gameState=d.state;mode='online';$('modeLabel').textContent='ONLINE DUEL · '+mark;renderOnline();show('game')});
+  socket.on('game-state',s=>{gameState=s;mode='online';$('modeLabel').textContent='ONLINE DUEL · '+mark;renderOnline();if($('wait').classList.contains('active'))show('game')});
+  socket.on('room-ready',s=>{gameState=s;renderOnline();show('game')});
+  socket.on('server-error',d=>{alert(d.message||'Terjadi kesalahan server.')});
+  socket.on('opponent-left',()=>{status('Teman keluar dari room. Kamu bisa menunggu atau kembali ke menu.');$('connection').textContent='Lawan terputus.'});
+  socket.on('room-closed',d=>{alert(d.message||'Room ditutup oleh host.');backToMenu()});
+ }
+ return socket;
+}
+function renderOnline(){
+ if(!gameState)return;
+ const s=gameState;
+ $('nx').textContent=s.players.X||'Menunggu…';$('no').textContent=s.players.O||'Menunggu…';
+ $('sx').textContent='MENANG '+s.scores.X;$('so').textContent='MENANG '+s.scores.O;
+ $('px').classList.toggle('active',s.turn==='X'&&!s.over);$('po').classList.toggle('active',s.turn==='O'&&!s.over);
+ const result=s.result,root=$('board');root.innerHTML='';
+ for(let i=0;i<9;i++){const b=document.createElement('button');b.className='cell'+(s.board[i]?' '+s.board[i].toLowerCase():'');if(result&&result.line.includes(i))b.classList.add('win');b.textContent=s.board[i]==='X'?'×':s.board[i]==='O'?'○':'';b.disabled=!!s.board[i]||s.over||s.turn!==mark||!s.players.O;b.setAttribute('aria-label','Kotak '+(i+1));b.addEventListener('click',()=>{if(socket&&socket.connected)socket.emit('make-move',{code:roomCode,index:i});else status('Koneksi server terputus.')});root.appendChild(b)}
+ if(s.over){$('gameStatus').textContent=s.result.winner==='D'?'Permainan seri!':(s.players[s.result.winner]||'Pemain')+' menang!';$('rematch').classList.remove('hidden')}
+ else{$('rematch').classList.add('hidden');$('gameStatus').textContent=!s.players.O?'Menunggu teman bergabung…':s.turn===mark?'Giliran kamu — pilih kotak':'Menunggu '+(s.players[s.turn]||'lawan')+'…'}
+}
+function connectAnd(action,code){const s=ensureSocket();if(!s.connected){s.once('connect',()=>s.emit(action,code||{}));return} s.emit(action,code||{})}
+function createRoom(){const s=ensureSocket();const go=()=>s.emit('create-room',{name:username});if(s.connected)go();else s.once('connect',go);$('waitStatus').textContent='Menghubungkan ke server…';show('wait')}
+function joinRoom(){const code=$('roomInput').value.trim().toUpperCase();if(!/^[A-Z0-9]{4,6}$/.test(code)){alert('Kode room harus 4–6 karakter.');return}const s=ensureSocket();const go=()=>s.emit('join-room',{code,name:username});if(s.connected)go();else s.once('connect',go);$('waitStatus').textContent='Menghubungkan ke room…';show('wait')}
+function backToMenu(){if(socket&&socket.connected)socket.emit('leave-room');roomCode='';gameState=null;show('menu')}
+async function copyCode(){try{await navigator.clipboard.writeText(roomCode);$('copy').textContent='✓ TERSALIN'}catch(e){alert('Kode room: '+roomCode)}setTimeout(()=>$('copy').textContent='▣ SALIN KODE',1300)}
+// Bot mode runs locally and does not require the online server.
+function check(b){const L=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];for(const line of L)if(b[line[0]]&&b[line[0]]===b[line[1]]&&b[line[0]]===b[line[2]])return{winner:b[line[0]],line};if(b.every(Boolean))return{winner:'D',line:[]};return null}
+function startBot(){if(socket&&socket.connected)socket.emit('leave-room');mode='bot';botState={board:Array(9).fill(''),turn:'X',over:false,scores:{X:0,O:0}};$('modeLabel').textContent='SOLO · VS BOT';show('game');renderBot()}
+function renderBot(){const s=botState,r=check(s.board);$('nx').textContent=username;$('no').textContent='BOT';$('sx').textContent='MENANG '+s.scores.X;$('so').textContent='MENANG '+s.scores.O;$('px').classList.toggle('active',s.turn==='X'&&!s.over);$('po').classList.toggle('active',s.turn==='O'&&!s.over);const root=$('board');root.innerHTML='';s.board.forEach((v,i)=>{const b=document.createElement('button');b.className='cell'+(v?' '+v.toLowerCase():'');if(r&&r.line.includes(i))b.classList.add('win');b.textContent=v==='X'?'×':v==='O'?'○':'';b.disabled=!!v||s.over||s.turn!=='X';b.onclick=()=>botMove(i);root.appendChild(b)});if(r){s.over=true;if(r.winner!=='D')s.scores[r.winner]++;$('gameStatus').textContent=r.winner==='D'?'Permainan seri!':(r.winner==='X'?username:'BOT')+' menang!';$('rematch').classList.remove('hidden')}else{$('rematch').classList.add('hidden');$('gameStatus').textContent=s.turn==='X'?'Giliran kamu — pilih kotak':'BOT sedang berpikir…'}}
+function botMove(i){const s=botState;if(s.over||s.turn!=='X'||s.board[i])return;s.board[i]='X';let r=check(s.board);if(r){renderBot();return}s.turn='O';renderBot();clearTimeout(botTimer);botTimer=setTimeout(()=>{let m=null;for(const p of ['O','X']){for(let j=0;j<9;j++)if(!s.board[j]){s.board[j]=p;const rr=check(s.board);s.board[j]='';if(rr&&rr.winner===p){m=j;break}}if(m!==null)break}if(m===null){const e=s.board.map((v,j)=>v?null:j).filter(v=>v!==null);m=e[Math.floor(Math.random()*e.length)]}s.board[m]='O';r=check(s.board);if(r){s.over=true;if(r.winner!=='D')s.scores[r.winner]++}else s.turn='X';renderBot()},400)}
+$('enter').onclick=()=>{const n=$('username').value.trim();if(n.length<2){alert('Nama minimal 2 karakter.');return}username=n;$('welcome').textContent='Halo, '+username+'!';show('menu')};
+$('username').onkeydown=e=>{if(e.key==='Enter')$('enter').click()};
+$('online').onclick=()=>show('lobby');$('botmode').onclick=startBot;$('rename').onclick=()=>show('user');
+$('create').onclick=createRoom;$('join').onclick=joinRoom;$('roomInput').onkeydown=e=>{if(e.key==='Enter')joinRoom()};
+$('lobbyBack').onclick=()=>show('menu');$('copy').onclick=copyCode;$('cancel').onclick=backToMenu;$('leave').onclick=backToMenu;$('gameBack').onclick=backToMenu;
+$('rematch').onclick=()=>{if(mode==='online'){if(socket&&socket.connected)socket.emit('rematch-request',{code:roomCode});}else{clearTimeout(botTimer);botState={board:Array(9).fill(''),turn:'X',over:false,scores:botState.scores};renderBot()}};
+</script>
+</body>
+</html>
